@@ -34,7 +34,7 @@
           super(props);
         }
         render() {
-          return this.props.msgs.map((m, i) => <Message msg={m} i={i} />);
+          return this.props.msgs.map((m, i) => <Message msg={m} key={i} />);
         }
       }
 
