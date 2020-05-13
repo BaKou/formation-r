@@ -34,7 +34,7 @@
           super(props);
         }
         render() {
-          return <Message msg={this.props.msgs} />;
+          return this.props.msgs.map((m, i) => <Message msg={m} i={i} />);
         }
       }
 
@@ -43,11 +43,7 @@
           super(props);
         }
         render() {
-          const messageList = this.props.msg.map((m, i) => {
-            return <p key={i}> {m} </p>;
-          });
-
-          return messageList;
+          return <p key={this.props.i}> {this.props.msg} </p>;
         }
       }
 
