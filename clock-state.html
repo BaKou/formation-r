@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <!-- babel => compilation du JSX -->
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <style>
+      .heading {
+        color: purple;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      class Clock extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            date: new Date(),
+            unmount: false
+          };
+          let count = 0;
+          const int = setInterval(() => {
+            this.setState({
+              date: new Date().toLocaleTimeString()
+            });
+
+            count++;
+
+            if (count === 5) {
+              this.setState({ unmount: false });
+            }
+          }, 1000);
+        }
+
+        componentWillUnmount() {
+          clearInterval(int);
+        }
+
+        render() {
+          return <h2>Il est {this.state.date}.</h2>;
+        }
+      }
+
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        render() {
+          return <Clock />;
+        }
+      }
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>

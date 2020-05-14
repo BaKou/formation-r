@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <!-- babel => compilation du JSX -->
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <style>
+      .heading {
+        color: purple;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <script type="text/babel">
+      class UserForm extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            list: ["ted"],
+            name: ""
+          };
+        }
+
+        add = () => {
+          if (
+            this.state.name &&
+            this.state.list.indexOf(this.state.name) === -1
+          ) {
+            this.state.list.push(this.state.name);
+            this.setState({
+              list: this.state.list
+            });
+          }
+        };
+
+        handleChange = event => {
+          this.setState({ name: event.target.value.toUpperCase() });
+        };
+
+        render() {
+          return (
+            <div>
+              <input
+                type="text"
+                onClick={this.add}
+                onChange={this.handleChange}
+                value={this.state.name}
+              />
+              <button onClick={this.add}>Ajouter</button>
+              <ul>
+                {this.state.list.map((name, i) => (
+                  <li key={i}> {name}</li>
+                ))}
+              </ul>
+            </div>
+          );
+        }
+      }
+
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        render() {
+          return (
+            <div>
+              <UserForm />
+            </div>
+          );
+        }
+      }
+
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
