@@ -20,43 +20,72 @@
       class LoginForm extends React.Component {
         constructor(props) {
           super(props);
-          const field = {email:"",password:""}
+          const field = { email: "", password: "" };
           this.state = {
-            error: false,
-            [name]:{...field}
+            emailError: false,
+            passwordError: false,
+            [name]: { ...field }
           };
         }
 
         add = () => {
-          if (
-            this.state.name &&
-            this.state.list.indexOf(this.state.name) === -1
-          ) {
-            this.state.list.push(this.state.name);
-            this.setState({
-              list: this.state.list
-            });
-          }
+          console.log("form correct");
+        };
+
+        validateEmail = email => {
+          var re = /^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+          return re.test(email);
         };
 
         handleChange = event => {
-          this.setState({ name: event.target.value.toUpperCase() });
+          const { name, value } = e.target;
+          this.setState({ [name]: value });
+
+          if (!this.validateEmail(event.target.value)) {
+            this.setState({ emailError: true });
+          } else {
+            this.setState({ emailError: false });
+          }
         };
 
         render() {
           return (
-              <form>
-              <div class="form-group">
-              <label for="exampleInputEmail1">Email address</label>
-              <input type="email" class="form-control" id="exampleInputEmail1" aria-describedby="emailHelp" placeholder="Enter email">
-              <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+            <form>
+              <div className="form-group">
+                <label htmlFor="exampleInputEmail1">Email address</label>
+                <input
+                  type="email"
+                  className="form-control"
+                  id="exampleInputEmail1"
+                  aria-describedby="emailHelp"
+                  placeholder="Enter email"
+                  onChange={this.handleChange}
+                  value={this.state.email}
+                />
+                {this.state.emailError && <p> l email n'est pas correct </p>}
+                <small id="emailHelp" className="form-text text-muted">
+                  We'll never share your email with anyone else.
+                </small>
               </div>
-              <div class="form-group">
-              <label for="exampleInputPassword1">Password</label>
-              <input type="password" class="form-control" id="exampleInputPassword1" placeholder="Password">
+              <div className="form-group">
+                <label htmlFor="exampleInputPassword1">Password</label>
+                <input
+                  type="password"
+                  className="form-control"
+                  id="exampleInputPassword1"
+                  placeholder="Password"
+                  value={this.state.password}
+                />
               </div>
-              <button type="submit" class="btn btn-primary">Submit</button>
-              </form>
+              <button
+                dase
+                type="submit"
+                className="btn btn-primary"
+                onClick={this.add}
+              >
+                Submit
+              </button>
+            </form>
           );
         }
       }
