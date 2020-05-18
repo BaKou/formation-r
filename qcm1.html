@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+  <body>
+    <div id="root"></div>
+    <!-- compilation JSX => JS -->
+    <script type="text/babel">
+      // Base de données
+
+      const questions = {
+        symfony: {
+          title: "Symfony design pattern",
+          choices: ["MMV", "MVC", "MMVV"],
+          response: 1,
+          type: "select",
+          name: "symfony",
+          feedback: "Symfony est basé sur le pattern MVC"
+        },
+        react: {
+          title: "React est-il un framework ?",
+          choices: ["yes", "no"],
+          response: 1,
+          type: "radio",
+          name: "react",
+          feedback: "React est une librairie"
+        },
+        jsx: {
+          title: "JSX c'est quoi ?",
+          choices: [
+            "JSX est un langage compilé",
+            "JSX est un sur-ensemble développé par Facebook"
+          ],
+          response: 1,
+          type: "radio",
+          name: "jsx",
+          feedback: "JSX est un sur ensemble à JS"
+        }
+      };
+
+      class Input extends React.Component {
+        render() {
+          <input type={this.props.type} />;
+        }
+      }
+      class Select extends React.Component {
+        render() {
+          <select>
+            {this.props.option.choices.map(opt => {
+              return <option value={opt}>opt </option>;
+            })}
+          </select>;
+        }
+      }
+      class Radio extends React.Component {
+        render() {}
+      }
+      class File extends React.Component {}
+      class Form extends React.Component {
+        render() {
+          return (
+            <form>
+              {this.props.children}
+              <button>Envoyer</button>
+            </form>
+          );
+        }
+      }
+
+      class Wrapper extends React.Component {
+        render() {
+          console.log(this.props.question);
+          console.log(this.props.question.title);
+
+          return this.props.question.title ? (
+            <h1>{this.props.question.title}</h1>
+          ) : (
+            <p>{this.props.wrapperTitle}</p>
+          );
+
+          {
+            this.props.children;
+          }
+        }
+      }
+
+      class User extends React.Component {
+        render() {
+          return (
+            <li>
+              id : {this.props.id} Name : {this.props.name}
+            </li>
+          );
+        }
+      }
+
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+          this.state = {
+            questions: questions,
+            wtype: false,
+            wrapperTitle: "Titre du formulaire "
+          };
+        }
+
+        render() {
+          return (
+            <Form>
+              <Wrapper question=""></Wrapper>
+              <Wrapper question={this.state.questions["symfony"]}>
+                <Select options={this.props.symfony} />
+              </Wrapper>
+              <Wrapper question={this.state.questions["react"]}>
+                <Radio />
+              </Wrapper>
+              <Wrapper question={this.state.questions["jsx"]}>
+                <Radio />
+              </Wrapper>
+            </Form>
+          );
+        }
+      }
+
+      // Rendu dans le DOM
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
