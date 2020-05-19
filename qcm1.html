@@ -49,16 +49,41 @@
         }
       }
       class Select extends React.Component {
+        selectElement = event => {
+          this.setState({
+            qOne: event.target.value
+          });
+        };
+
         render() {
-          <select>
-            {this.props.option.choices.map(opt => {
-              return <option value={opt}>opt </option>;
-            })}
-          </select>;
+          return (
+            <select onChange={selectElement}>
+              {this.props.options.map((opt, i) => {
+                return (
+                  <option value={opt} key={i}>
+                    {opt}
+                  </option>
+                );
+              })}
+            </select>
+          );
         }
       }
       class Radio extends React.Component {
-        render() {}
+        render() {
+          return (
+            <div>
+              {this.props.options.map((opt, i) => {
+                return (
+                  <div key={i}>
+                    <input type="radio" value={opt} />
+                    <label>{opt}</label>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
       }
       class File extends React.Component {}
       class Form extends React.Component {
@@ -74,27 +99,19 @@
 
       class Wrapper extends React.Component {
         render() {
-          console.log(this.props.question);
-          console.log(this.props.question.title);
+          let title = "";
 
-          return this.props.question.title ? (
-            <h1>{this.props.question.title}</h1>
-          ) : (
-            <p>{this.props.wrapperTitle}</p>
-          );
-
-          {
-            this.props.children;
+          if (this.props.question.title) {
+            title = <h1>{this.props.question.title}</h1>;
+          } else {
+            title = <p>{this.props.wrapperTitle}</p>;
           }
-        }
-      }
 
-      class User extends React.Component {
-        render() {
           return (
-            <li>
-              id : {this.props.id} Name : {this.props.name}
-            </li>
+            <div>
+              {title}
+              {this.props.children}
+            </div>
           );
         }
       }
@@ -104,24 +121,37 @@
           super(props);
           this.state = {
             questions: questions,
-            wtype: false,
-            wrapperTitle: "Titre du formulaire "
+            wrapperTitle: "Titre du formulaire",
+            score: 0,
+            qOne: "",
+            qTwo: "",
+            qThree: ""
           };
         }
 
         render() {
+          let content;
+          {
+            for (const property in this.state.questions) {
+              const ComponentName = this.state.questions[property].type;
+              console.log(this.state.questions[property].type);
+              content = (
+                <Wrapper question={this.state.questions[property].title}>
+                  <ComponentName
+                    options={this.state.questions[property].choices}
+                  />
+                </Wrapper>
+              );
+            }
+          }
+
           return (
             <Form>
-              <Wrapper question=""></Wrapper>
-              <Wrapper question={this.state.questions["symfony"]}>
-                <Select options={this.props.symfony} />
-              </Wrapper>
-              <Wrapper question={this.state.questions["react"]}>
-                <Radio />
-              </Wrapper>
-              <Wrapper question={this.state.questions["jsx"]}>
-                <Radio />
-              </Wrapper>
+              <Wrapper
+                question=""
+                wrapperTitle={this.state.wrapperTitle}
+              ></Wrapper>
+              {content}
             </Form>
           );
         }
