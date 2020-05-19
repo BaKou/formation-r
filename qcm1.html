@@ -1,18 +1,17 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
 
-<head>
-  <meta charset="UTF-8" />
-  <title>Hello React</title>
-  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-</head>
-
-<body>
-  <div id="root"></div>
-  <!-- compilation JSX => JS -->
-  <script type="text/babel">
+  <body>
+    <div id="root"></div>
+    <!-- compilation JSX => JS -->
+    <script type="text/babel">
       // Base de données
 
       const questions = {
@@ -45,24 +44,26 @@
         }
       };
 
-      class Input extends React.Component {
+      class InputComp extends React.Component {
         render() {
           <input type={this.props.type} />;
         }
       }
-      class Select extends React.Component {
+      class SelectComp extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
         selectElement = event => {
-          this.setState({
-            qOne: event.target.value
-          });
+          this.props.changeScore(this.props.qNumber, event.target.value);
         };
 
         render() {
           return (
-            <select onChange={selectElement}>
+            <select onChange={this.selectElement}>
               {this.props.options.map((opt, i) => {
                 return (
-                  <option value={opt} key={i}>
+                  <option value={i} key={i}>
                     {opt}
                   </option>
                 );
@@ -71,14 +72,27 @@
           );
         }
       }
-      class Radio extends React.Component {
+      class RadioComp extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        selectElement = event => {
+          this.props.changeScore(this.props.qNumber, event.target.value);
+        };
+
         render() {
           return (
             <div>
               {this.props.options.map((opt, i) => {
                 return (
                   <div key={i}>
-                    <input type="radio" value={opt} />
+                    <input
+                      type="radio"
+                      value={i}
+                      name={"test" + this.props.name}
+                      onChange={this.selectElement}
+                    />
                     <label>{opt}</label>
                   </div>
                 );
@@ -89,11 +103,21 @@
       }
       class File extends React.Component {}
       class Form extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        submitForm = () => {
+          this.props.submit();
+        };
+
         render() {
           return (
             <form>
               {this.props.children}
-              <button>Envoyer</button>
+              <button onClick={this.submitForm} disabled={this.props.dsb}>
+                Envoyer
+              </button>
             </form>
           );
         }
@@ -102,9 +126,8 @@
       class Wrapper extends React.Component {
         render() {
           let title = "";
-
-          if (this.props.question.title) {
-            title = <h1>{this.props.question.title}</h1>;
+          if (this.props.question) {
+            title = <h1>{this.props.question}</h1>;
           } else {
             title = <p>{this.props.wrapperTitle}</p>;
           }
@@ -125,42 +148,94 @@
             questions: questions,
             wrapperTitle: "Titre du formulaire",
             score: 0,
-            qOne: "",
-            qTwo: "",
-            qThree: ""
+            answers: [],
+            goodAnswers: [],
+            oneGood: false,
+            twoGood: false,
+            threeGood: false
+          };
+          this.components = {
+            radio: RadioComp,
+            input: InputComp,
+            select: SelectComp
           };
         }
 
-        capitalize = s => {
-          if (typeof s !== "string") return "";
-          return s.charAt(0).toUpperCase() + s.slice(1);
+        setScore = (qNumber, response) => {
+          let ans = this.state.answers;
+          ans.splice(qNumber, 1, response);
+          this.setState({
+            answers: ans
+          });
         };
 
-        contentT = () => {
-          const components = {"radio": "Radio",'input':'Input','select':'Select'};
+        submit = () => {
+          if (this.state.goodAnswers[0] === this.state.answers[0]) {
+            this.setState({
+              oneGood: true,
+              score: this.state.score + 1
+            });
+          }
 
+          if (this.state.goodAnswers[1] === this.state.answers[1]) {
+            this.setState({
+              twoGood: true,
+              score: this.state.score + 1
+            });
+          }
+
+          if (this.state.goodAnswers[2] === this.state.answers[2]) {
+            this.setState({
+              threeGood: true,
+              score: this.state.score + 1
+            });
+          }
+
+          console.log(this.state.score);
+        };
+
+        questionContent = () => {
+          let content = [];
+          let i = 0;
+          let goodAnswers = [];
           for (const property in this.state.questions) {
-            let ComponentName = components[this.state.questions[property].type]
-            console.log(ComponentName);
-            console.log(this.state.questions[property].type);
-            return (
-              <Wrapper question={this.state.questions[property].title}>
+            let ComponentName = this.components[
+              this.state.questions[property].type
+            ];
+
+            goodAnswers.push(this.state.questions[property].response);
+            content.push(
+              <Wrapper
+                question={this.state.questions[property].title}
+                title=""
+                key={i}
+              >
                 <ComponentName
                   options={this.state.questions[property].choices}
+                  qNumber={i}
+                  changeScore={this.setScore}
+                  name={i}
                 />
               </Wrapper>
             );
+            i++;
           }
+
+          this.setState({
+            goodAnswers: goodAnswers
+          });
+
+          return content;
         };
 
         render() {
           return (
-            <Form>
-              <Wrapper
-                question=""
-                wrapperTitle={this.state.wrapperTitle}
-              ></Wrapper>
-              {this.contentT()}
+            <Form
+              answers={this.state.answer}
+              dsb={this.state.answers.length !== 3}
+            >
+              <Wrapper question="" title={this.state.wrapperTitle}></Wrapper>
+              {this.questionContent()}
             </Form>
           );
         }
@@ -169,6 +244,5 @@
       // Rendu dans le DOM
       ReactDOM.render(<App />, document.getElementById("root"));
     </script>
-</body>
-
+  </body>
 </html>
