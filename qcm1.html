@@ -1,16 +1,18 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <title>Hello React</title>
-    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
-    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
-    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
-  </head>
-  <body>
-    <div id="root"></div>
-    <!-- compilation JSX => JS -->
-    <script type="text/babel">
+
+<head>
+  <meta charset="UTF-8" />
+  <title>Hello React</title>
+  <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <!-- compilation JSX => JS -->
+  <script type="text/babel">
       // Base de données
 
       const questions = {
@@ -129,29 +131,36 @@
           };
         }
 
-        render() {
-          let content;
-          {
-            for (const property in this.state.questions) {
-              const ComponentName = this.state.questions[property].type;
-              console.log(this.state.questions[property].type);
-              content = (
-                <Wrapper question={this.state.questions[property].title}>
-                  <ComponentName
-                    options={this.state.questions[property].choices}
-                  />
-                </Wrapper>
-              );
-            }
-          }
+        capitalize = s => {
+          if (typeof s !== "string") return "";
+          return s.charAt(0).toUpperCase() + s.slice(1);
+        };
 
+        contentT = () => {
+          const components = {"radio": "Radio",'input':'Input','select':'Select'};
+
+          for (const property in this.state.questions) {
+            let ComponentName = components[this.state.questions[property].type]
+            console.log(ComponentName);
+            console.log(this.state.questions[property].type);
+            return (
+              <Wrapper question={this.state.questions[property].title}>
+                <ComponentName
+                  options={this.state.questions[property].choices}
+                />
+              </Wrapper>
+            );
+          }
+        };
+
+        render() {
           return (
             <Form>
               <Wrapper
                 question=""
                 wrapperTitle={this.state.wrapperTitle}
               ></Wrapper>
-              {content}
+              {this.contentT()}
             </Form>
           );
         }
@@ -160,5 +169,6 @@
       // Rendu dans le DOM
       ReactDOM.render(<App />, document.getElementById("root"));
     </script>
-  </body>
+</body>
+
 </html>
