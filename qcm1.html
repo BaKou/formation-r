@@ -44,6 +44,8 @@
         }
       };
 
+      const wrapperTitle = "Titre du formulaire";
+
       class InputComp extends React.Component {
         render() {
           <input type={this.props.type} />;
@@ -61,6 +63,7 @@
         render() {
           return (
             <select onChange={this.selectElement}>
+              <option value=""></option>
               {this.props.options.map((opt, i) => {
                 return (
                   <option value={i} key={i}>
@@ -107,7 +110,8 @@
           super(props);
         }
 
-        submitForm = () => {
+        submitForm = e => {
+          e.preventDefault();
           this.props.submit();
         };
 
@@ -133,7 +137,7 @@
           if (this.props.question) {
             title = <h1>{this.props.question}</h1>;
           } else {
-            title = <p>{this.props.wrapperTitle}</p>;
+            title = <p>{wrapperTitle}</p>;
           }
 
           return (
@@ -150,14 +154,11 @@
           super(props);
 
           this.state = {
-            questions: questions,
-            wrapperTitle: "Titre du formulaire",
             score: 0,
             answers: [],
-            goodAnswers: [],
-            oneGood: false,
-            twoGood: false,
-            threeGood: false
+            page: 1,
+            message: [],
+            isSubmit: false
           };
           this.components = {
             radio: RadioComp,
@@ -166,86 +167,48 @@
           };
         }
 
-        componentDidMount = () => {
-          let goodA = [];
-          goodA.push(this.state.questions.symfony.response);
-          goodA.push(this.state.questions.react.response);
-          goodA.push(this.state.questions.jsx.response);
-          this.setState({
-            goodAnswers: goodA
-          });
-        };
-
         setScore = (qNumber, response) => {
           let ans = this.state.answers;
           ans.splice(qNumber, 1, response);
-          console.log(ans);
-          console.log(ans.length);
           this.setState({
             answers: ans
           });
         };
 
         submit = () => {
-          console.log(this.state.goodAnswers[0]);
-          console.log(this.state.answers[0]);
-          console.log(
-            parseInt(this.state.goodAnswers[0]) ===
-              parseInt(this.state.answers[0])
-          );
+          let score = 0;
+          let feedback = [];
+          let i = 0;
 
-          if (
-            parseInt(this.state.goodAnswers[0]) ===
-            parseInt(this.state.answers[0])
-          ) {
-            console.log("score ++1");
-            this.setState({
-              oneGood: true,
-              score: this.state.score + 1
-            });
+          for (const key in questions) {
+            if (this.state.answers[i] == questions[key].response) {
+              score++;
+              feedback.push(`Bravo ! ${questions[key].feedback}`);
+            } else {
+              feedback.push(
+                `Dommage voyez le feedback : ${questions[key].feedback}`
+              );
+            }
+            i++;
           }
 
-          if (
-            parseInt(this.state.goodAnswers[1]) ===
-            parseInt(this.state.answers[1])
-          ) {
-            console.log("score ++2");
-            this.setState({
-              twoGood: true,
-              score: this.state.score + 1
-            });
-          }
-
-          if (
-            parseInt(this.state.goodAnswers[2]) ===
-            parseInt(this.state.answers[2])
-          ) {
-            console.log("score ++3");
-            this.setState({
-              threeGood: true,
-              score: this.state.score + 1
-            });
-          }
-
-          console.log(this.state.score);
+          this.setState({
+            score: score,
+            messages: feedback,
+            isSubmit: true
+          });
         };
 
         questionContent = () => {
           let content = [];
           let i = 0;
-          for (const property in this.state.questions) {
-            let ComponentName = this.components[
-              this.state.questions[property].type
-            ];
+          for (const property in questions) {
+            let ComponentName = this.components[questions[property].type];
 
             content.push(
-              <Wrapper
-                question={this.state.questions[property].title}
-                title=""
-                key={i}
-              >
+              <Wrapper question={questions[property].title} title="" key={i}>
                 <ComponentName
-                  options={this.state.questions[property].choices}
+                  options={questions[property].choices}
                   qNumber={i}
                   changeScore={this.setScore}
                   name={i}
@@ -257,6 +220,21 @@
           return content;
         };
 
+        result = () => {
+          if (this.state.isSubmit === true) {
+            return (
+              <React.Fragment>
+                <h2>Score : {this.state.score} </h2>
+                {this.state.messages.map((message, i) => (
+                  <p key={i}>{message}</p>
+                ))}
+              </React.Fragment>
+            );
+          } else {
+            return "";
+          }
+        };
+
         render() {
           return (
             <div>
@@ -266,10 +244,11 @@
                 dsb={this.state.answers.length !== 3}
                 submit={this.submit}
               >
-                <Wrapper question="" title={this.state.wrapperTitle}></Wrapper>
+                <Wrapper question="" title={wrapperTitle}></Wrapper>
                 {this.questionContent()}
               </Form>
-              {this.state.oneGood ? "bref " : ""}
+
+              {this.result()}
             </div>
           );
         }

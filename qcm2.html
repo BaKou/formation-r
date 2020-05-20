@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+    <style type="text/css">
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- compilation JSX => JS -->
+    <script type="text/babel">
+      // Base de données
+
+      const questions = {
+        symfony: {
+          title: "Symfony design pattern",
+          choices: ["MMV", "MVC", "MMVV"],
+          response: 1,
+          type: "select",
+          name: "symfony",
+          feedback: "Symfony est basé sur le pattern MVC"
+        },
+        react: {
+          title: "React est-il un framework ?",
+          choices: ["yes", "no"],
+          response: 1,
+          type: "radio",
+          name: "react",
+          feedback: "React est une librairie"
+        },
+        jsx: {
+          title: "JSX c'est quoi ?",
+          choices: [
+            "JSX est un langage compilé",
+            "JSX est un sur-ensemble développé par Facebook"
+          ],
+          response: 1,
+          type: "radio",
+          name: "jsx",
+          feedback: "JSX est un sur ensemble à JS"
+        }
+      };
+
+      const wrapperTitle = "Titre du formulaire";
+
+      class InputComp extends React.Component {
+        render() {
+          <input type={this.props.type} />;
+        }
+      }
+      class SelectComp extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        selectElement = event => {
+          this.props.changeScore(this.props.qNumber, event.target.value);
+        };
+
+        render() {
+          return (
+            <select onChange={this.selectElement}>
+              <option value=""></option>
+              {this.props.options.map((opt, i) => {
+                return (
+                  <option value={i} key={i}>
+                    {opt}
+                  </option>
+                );
+              })}
+            </select>
+          );
+        }
+      }
+      class RadioComp extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        selectElement = event => {
+          this.props.changeScore(this.props.qNumber, event.target.value);
+        };
+
+        render() {
+          return (
+            <div>
+              {this.props.options.map((opt, i) => {
+                return (
+                  <div key={i}>
+                    <input
+                      type="radio"
+                      value={i}
+                      name={"test" + this.props.name}
+                      onChange={this.selectElement}
+                    />
+                    <label>{opt}</label>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        }
+      }
+      class File extends React.Component {}
+      class Form extends React.Component {
+        constructor(props) {
+          super(props);
+        }
+
+        submitForm = e => {
+          e.preventDefault();
+          this.props.submit();
+        };
+
+        render() {
+          return (
+            <form>
+              {this.props.children}
+              {this.props.page === this.props.end ? (
+                <button
+                  onClick={this.submitForm}
+                  disabled={this.props.dsb}
+                  type="button"
+                >
+                  Envoyer
+                </button>
+              ) : (
+                ""
+              )}
+            </form>
+          );
+        }
+      }
+
+      class Wrapper extends React.Component {
+        render() {
+          let title = "";
+          if (this.props.question) {
+            title = <h1>{this.props.question}</h1>;
+          } else {
+            title = <p>{wrapperTitle}</p>;
+          }
+
+          return (
+            <div>
+              {title}
+              {this.props.children}
+            </div>
+          );
+        }
+      }
+
+      class App extends React.Component {
+        constructor(props) {
+          super(props);
+
+          this.state = {
+            score: 0,
+            answers: [],
+            page: 1,
+            message: [],
+            isSubmit: false
+          };
+          this.components = {
+            radio: RadioComp,
+            input: InputComp,
+            select: SelectComp
+          };
+        }
+
+        setScore = (qNumber, response) => {
+          let ans = this.state.answers;
+          ans.splice(qNumber, 1, response);
+          this.setState({
+            answers: ans
+          });
+        };
+
+        submit = () => {
+          let score = 0;
+          let feedback = [];
+          let i = 0;
+
+          for (const key in questions) {
+            if (this.state.answers[i] == questions[key].response) {
+              score++;
+              feedback.push(`Bravo ! ${questions[key].feedback}`);
+            } else {
+              feedback.push(
+                `Dommage voyez le feedback : ${questions[key].feedback}`
+              );
+            }
+            i++;
+          }
+
+          this.setState({
+            score: score,
+            messages: feedback,
+            isSubmit: true
+          });
+        };
+
+        questionContent = () => {
+          let content = [];
+          let i = 0;
+          for (const property in questions) {
+            let ComponentName = this.components[questions[property].type];
+
+            content.push(
+              <div
+                key={i}
+                className={this.state.page === i + 1 ? "" : "hidden"}
+              >
+                <Wrapper question={questions[property].title} title="" key={i}>
+                  <ComponentName
+                    options={questions[property].choices}
+                    qNumber={i}
+                    changeScore={this.setScore}
+                    name={i}
+                  />
+                </Wrapper>
+              </div>
+            );
+
+            i++;
+          }
+          return content;
+        };
+
+        result = () => {
+          if (this.state.isSubmit === true) {
+            return (
+              <React.Fragment>
+                <h2>Score : {this.state.score} </h2>
+                {this.state.messages.map((message, i) => (
+                  <p key={i}>{message}</p>
+                ))}
+              </React.Fragment>
+            );
+          } else {
+            return "";
+          }
+        };
+
+        nextPage = () => {
+          this.setState({
+            page: this.state.page + 1
+          });
+        };
+
+        backPage = () => {
+          this.setState({
+            page: this.state.page - 1
+          });
+        };
+
+        reset = () => {
+          this.setState({
+            score: 0,
+            answers: [],
+            page: 1,
+            message: [],
+            isSubmit: false
+          });
+        };
+
+        render() {
+          const tabQuestion = Object.values(questions);
+          const nbQuestion = tabQuestion.length;
+          return (
+            <div>
+              <Form
+                onclick={this.submit}
+                answers={this.state.answer}
+                dsb={this.state.answers.length !== 3}
+                submit={this.submit}
+                page={this.state.page}
+                end={nbQuestion}
+              >
+                <Wrapper question="" title={wrapperTitle}></Wrapper>
+                {this.questionContent()}
+              </Form>
+              {this.state.page > 1 && !this.state.isSubmit ? (
+                <button onClick={this.backPage}> precedent</button>
+              ) : (
+                ""
+              )}
+              {this.state.page < 3 ? (
+                <button onClick={this.nextPage}> suivant</button>
+              ) : (
+                ""
+              )}
+
+              {this.result()}
+
+              {this.state.isSubmit === true ? (
+                <button onClick={this.reset}>Reset</button>
+              ) : (
+                ""
+              )}
+            </div>
+          );
+        }
+      }
+
+      // Rendu dans le DOM
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
