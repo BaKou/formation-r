@@ -1,14 +1,10 @@
 import React from "react";
-import logo from "./logo.svg";
-import Token from "./Token";
 import "./App.css";
-
+import Home from "./component/home";
 function App() {
   return (
     <div className="App">
-      <header className="App-header">
-        <Token />
-      </header>
+      <Home />
     </div>
   );
 }
