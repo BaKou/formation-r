@@ -1,0 +1,27 @@
+.noeud {
+  border-radius: 5px;
+  border: 2px solid black;
+  width: 150px;
+  height: 50px;
+  text-align: center;
+}
+
+.child {
+  position: absolute;
+  left: 80px;
+}
+
+.config {
+  border: 1px solid black;
+  position: absolute;
+  left: 180px;
+}
+
+@keyframes App-logo-spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}

@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- compilation JSX => JS -->
+    <script type="text/babel">
+      const TestState = props => {
+        const [count, setCount] = React.useState(0);
+        const [active, setActive] = React.useState(false);
+        let timerID = null;
+
+        const start = () => {
+          console.log("start");
+          timerID = setInterval(() => {
+            setCount(count => count + 1);
+          }, 1000);
+        };
+
+        const stop = () => {
+          console.log("stop");
+          clearInterval(timerID);
+        };
+
+        React.useEffect(() => {
+          return () => {
+            console.log("unmount component");
+            setCount(0);
+            clearInterval(timerID);
+          };
+        }, []);
+
+        React.useEffect(() => {
+          if (active) {
+            start();
+          }
+          return () => {
+            if (active) {
+              stop();
+            }
+          };
+        }, [active]);
+
+        return (
+          <div>
+            <button onClick={() => setActive(!active)}>
+              {active ? "stop" : "start"}
+            </button>
+            Counter : {count}
+          </div>
+        );
+      };
+
+      const App = props => {
+        const [showCounter, setShowCounter] = React.useState(false);
+
+        return (
+          <div>
+            <button onClick={() => setShowCounter(!showCounter)}>
+              Toggle counter
+            </button>
+            {showCounter && <TestState />}
+          </div>
+        );
+      };
+
+      // Rendu dans le DOM
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
