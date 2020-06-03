@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- compilation JSX => JS -->
+    <script type="text/babel">
+      const Notes = props => {
+        const nbNotes = 5;
+        let tabInput = [];
+        let input0 = React.useRef(null);
+        let input1 = React.useRef(null);
+        let input2 = React.useRef(null);
+        let input3 = React.useRef(null);
+        let input4 = React.useRef(null);
+
+        let tabRef = [input0, input1, input2, input3, input4];
+        for (let i = 0; i < nbNotes; i++) {
+          let [`inputRef${ i }`] = React.useRef(null);
+          tabref.push(inputRef + { i })
+        }
+
+        const renderNote = () => {
+          for (let i = 0; i < nbNotes; i++) {
+            tabInput.push(
+              <div key={i}>
+                <input ref={tabRef[i]} type="text" />
+              </div>
+            );
+          }
+
+          return tabInput;
+        };
+
+        const calculeMoyenne = e => {
+          e.preventDefault();
+          let total = 0;
+
+          for (let i = 0; i < nbNotes; i++) {
+            console.log(tabRef[i].current.value);
+            total += parseInt(tabRef[i].current.value);
+          }
+
+          console.log(total / nbNotes);
+        };
+
+        return (
+          <div>
+            <label> Note : </label>
+            {renderNote()}
+            <button type="submit" onClick={calculeMoyenne}>
+              calcule moyenne
+            </button>
+          </div>
+        );
+      };
+
+      const App = props => {
+        return (
+          <div>
+            <Notes />
+          </div>
+        );
+      };
+
+      // Rendu dans le DOM
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>

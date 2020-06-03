@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>Hello React</title>
+    <script src="https://unpkg.com/react@16/umd/react.development.js"></script>
+    <script src="https://unpkg.com/react-dom@16/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+  </head>
+
+  <body>
+    <div id="root"></div>
+    <!-- compilation JSX => JS -->
+    <script type="text/babel">
+      const url = `https://jsonplaceholder.typicode.com/users`;
+      let result = [];
+      let choices = [];
+
+      const User = props => {
+        React.useEffect(() => {
+          console.log(props.query);
+          getData();
+        }, [props.query]);
+
+        const getData = () => {
+          const reg = new RegExp(".*" + props.query + ".*", "i");
+          choices = result.filter(c => c.name.match(reg));
+          console.log(choices);
+        };
+
+        if (choices.length > 0) {
+          console.log("yes");
+          return (
+            <div>
+              <ul>
+                {choices.map((c, i) => {
+                  return <li key={i}>{c.name}</li>;
+                })}
+              </ul>
+            </div>
+          );
+        } else {
+          return "Pas de résultat";
+        }
+      };
+
+      const Search = props => {
+        const [query, setQuery] = React.useState(false);
+
+        React.useEffect(() => {
+          getResult();
+        }, [url]);
+
+        const getResult = async () => {
+          result = await fetch(url).then(res => res.json());
+        };
+
+        getResult();
+
+        const changeQuery = event => {
+          setQuery(event.target.value);
+        };
+
+        return (
+          <div>
+            <label> Name : </label>
+            <input type="text" name="userSearch" onChange={changeQuery} />
+            {result.length > 0 ? <User query={query} /> : ""}
+          </div>
+        );
+      };
+
+      const App = props => {
+        return (
+          <div>
+            <Search />
+          </div>
+        );
+      };
+
+      // Rendu dans le DOM
+      ReactDOM.render(<App />, document.getElementById("root"));
+    </script>
+  </body>
+</html>
